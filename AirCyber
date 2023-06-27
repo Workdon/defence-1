@@ -1,0 +1,66 @@
+# cyber_defense.py
+
+class Firewall:
+    def __init__(self):
+        self.rules = []
+
+    def add_rule(self, rule):
+        self.rules.append(rule)
+
+    def remove_rule(self, rule):
+        if rule in self.rules:
+            self.rules.remove(rule)
+
+    def filter_traffic(self, packet):
+        for rule in self.rules:
+            if rule.matches(packet):
+                return rule.action
+
+        return "ALLOW"  # Default action if no rules match
+
+
+class Rule:
+    def __init__(self, source_ip, destination_ip, action):
+        self.source_ip = source_ip
+        self.destination_ip = destination_ip
+        self.action = action
+
+    def matches(self, packet):
+        return packet.source_ip == self.source_ip and packet.destination_ip == self.destination_ip
+
+
+class Packet:
+    def __init__(self, source_ip, destination_ip, data):
+        self.source_ip = source_ip
+        self.destination_ip = destination_ip
+        self.data = data
+
+
+# Usage example
+def main():
+    firewall = Firewall()
+
+    # Add rules to the firewall
+    rule1 = Rule("192.168.0.1", "10.0.0.1", "BLOCK")
+    rule2 = Rule("10.0.0.2", "192.168.0.2", "BLOCK")
+    firewall.add_rule(rule1)
+    firewall.add_rule(rule2)
+
+    # Incoming packets
+    packet1 = Packet("192.168.0.1", "10.0.0.1", "Data packet 1")
+    packet2 = Packet("10.0.0.2", "192.168.0.2", "Data packet 2")
+    packet3 = Packet("10.0.0.3", "192.168.0.3", "Data packet 3")
+
+    # Filter incoming packets using the firewall
+    action1 = firewall.filter_traffic(packet1)
+    action2 = firewall.filter_traffic(packet2)
+    action3 = firewall.filter_traffic(packet3)
+
+    # Output the actions
+    print(f"Packet 1: {action1}")
+    print(f"Packet 2: {action2}")
+    print(f"Packet 3: {action3}")
+
+
+if __name__ == "__main__":
+    main()
