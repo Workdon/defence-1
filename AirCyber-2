@@ -1,0 +1,160 @@
+# cyber_defense.py
+
+class Firewall:
+    def __init__(self):
+        self.rules = []
+
+    def add_rule(self, rule):
+        self.rules.append(rule)
+
+    def remove_rule(self, rule):
+        if rule in self.rules:
+            self.rules.remove(rule)
+
+    def filter_traffic(self, packet):
+        for rule in self.rules:
+            if rule.matches(packet):
+                return rule.action
+
+        return "ALLOW"  # Default action if no rules match
+
+
+class Rule:
+    def __init__(self, source_ip, destination_ip, action):
+        self.source_ip = source_ip
+        self.destination_ip = destination_ip
+        self.action = action
+
+    def matches(self, packet):
+        return packet.source_ip == self.source_ip and packet.destination_ip == self.destination_ip
+
+
+class Packet:
+    def __init__(self, source_ip, destination_ip, data):
+        self.source_ip = source_ip
+        self.destination_ip = destination_ip
+        self.data = data
+
+
+# Usage example
+def main():
+    firewall = Firewall()
+
+    # Add rules to the firewall
+    rule1 = Rule("192.168.0.1", "10.0.0.1", "BLOCK")
+    rule2 = Rule("10.0.0.2", "192.168.0.2", "BLOCK")
+    firewall.add_rule(rule1)
+    firewall.add_rule(rule2)
+
+    # Incoming packets
+    packet1 = Packet("192.168.0.1", "10.0.0.1", "Data packet 1")
+    packet2 = Packet("10.0.0.2", "192.168.0.2", "Data packet 2")
+    packet3 = Packet("10.0.0.3", "192.168.0.3", "Data packet 3")
+
+    # Filter incoming packets using the firewall
+    action1 = firewall.filter_traffic(packet1)
+    action2 = firewall.filter_traffic(packet2)
+    action3 = firewall.filter_traffic(packet3)
+
+    # Output the actions
+    print(f"Packet 1: {action1}")
+    print(f"Packet 2: {action2}")
+    print(f"Packet 3: {action3}")
+
+
+if __name__ == "__main__":
+    main()
+In this code, we define three classes: Firewall, Rule, and Packet. The Firewall class represents the firewall itself, which contains a list of rules. The Rule class defines a rule with source and destination IP addresses and an action (e.g., "ALLOW" or "BLOCK"). The Packet class represents an incoming network packet, containing source and destination IP addresses and data.
+
+The Firewall class has methods to add and remove rules, as well as a filter_traffic method that matches incoming packets against the rules and returns the corresponding action.
+
+In the main function, we create a Firewall object, add some rules, and create packets to test the filtering functionality. The actions resulting from the filtering are then printed to the console.
+
+Remember to further extend and refine the code according to your specific requirements. You can add more advanced features, improve error handling, implement logging, or integrate the code with other components of a comprehensive cyber defense system.
+
+
+
+
+
+User
+add more advanced features
+ChatGPT
+Certainly! Here's an expanded version of the previous code with some additional advanced features:
+
+python
+Copy code
+# cyber_defense.py
+
+class Firewall:
+    def __init__(self):
+        self.rules = []
+
+    def add_rule(self, rule):
+        self.rules.append(rule)
+
+    def remove_rule(self, rule):
+        if rule in self.rules:
+            self.rules.remove(rule)
+
+    def filter_traffic(self, packet):
+        matched_rules = []
+        for rule in self.rules:
+            if rule.matches(packet):
+                matched_rules.append(rule)
+
+        if matched_rules:
+            # Sort the matched rules based on priority (higher priority first)
+            matched_rules.sort(key=lambda x: x.priority, reverse=True)
+            return matched_rules[0].action
+
+        return "ALLOW"  # Default action if no rules match
+
+
+class Rule:
+    def __init__(self, source_ip, destination_ip, action, priority=0):
+        self.source_ip = source_ip
+        self.destination_ip = destination_ip
+        self.action = action
+        self.priority = priority
+
+    def matches(self, packet):
+        return packet.source_ip == self.source_ip and packet.destination_ip == self.destination_ip
+
+
+class Packet:
+    def __init__(self, source_ip, destination_ip, data):
+        self.source_ip = source_ip
+        self.destination_ip = destination_ip
+        self.data = data
+
+
+# Usage example
+def main():
+    firewall = Firewall()
+
+    # Add rules to the firewall with priorities
+    rule1 = Rule("192.168.0.1", "10.0.0.1", "BLOCK", priority=2)
+    rule2 = Rule("10.0.0.2", "192.168.0.2", "BLOCK", priority=1)
+    rule3 = Rule("10.0.0.0/24", "192.168.0.0/24", "BLOCK", priority=3)
+    firewall.add_rule(rule1)
+    firewall.add_rule(rule2)
+    firewall.add_rule(rule3)
+
+    # Incoming packets
+    packet1 = Packet("192.168.0.1", "10.0.0.1", "Data packet 1")
+    packet2 = Packet("10.0.0.2", "192.168.0.2", "Data packet 2")
+    packet3 = Packet("10.0.0.3", "192.168.0.3", "Data packet 3")
+
+    # Filter incoming packets using the firewall
+    action1 = firewall.filter_traffic(packet1)
+    action2 = firewall.filter_traffic(packet2)
+    action3 = firewall.filter_traffic(packet3)
+
+    # Output the actions
+    print(f"Packet 1: {action1}")
+    print(f"Packet 2: {action2}")
+    print(f"Packet 3: {action3}")
+
+
+if __name__ == "__main__":
+    main()
